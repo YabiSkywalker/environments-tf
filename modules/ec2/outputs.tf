@@ -3,6 +3,21 @@ output "instance_ids" {
   value = { for k, v in aws_instance.this : k => v.id }
 }
 
+output "instance_types" {
+  description = "The types of the instances"
+  value = { for k, v in aws_instance.this : k => v.instance_type }
+}
+
+output "instance_security_groups" {
+  description = "The security groups of the instances"
+  value = { for k, v in aws_instance.this : k => v.vpc_security_group_ids }
+}
+
+output "instance_subnets" {
+  description = "The subnets of the instances"
+  value = { for k, v in aws_instance.this : k => v.subnet_id }
+}
+
 output "arn" {
   description = "The ARN of the instances"
   value = { for k, v in aws_instance.this : k => v.arn }
@@ -25,6 +40,10 @@ output "private_ip" {
 
 }
 
+output "instance_name_tags" {
+  description = "The names of the instances"
+  value = { for k, v in aws_instance.this : k => v.tags }
+}
 
 
 
