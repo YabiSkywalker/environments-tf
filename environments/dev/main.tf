@@ -42,20 +42,15 @@ module "umeet_instances" {
 }
 
 module "umeet_bucket" {
-  source                = "../../modules/s3"
+  source                        = "../../modules/s3"
 
-  bucket                = "umeet-dev-bucket"
-  enable_versioning     = true
-  bucket_policy         = jsonencode({
-
-    Version = "2012-10-17"
-    Statement = [{
-      Effect    = "Allow"
-      Principal = "*"
-      Action    = "s3:GetObject"
-      Resource  = "arn:aws:s3:::umeet-dev-bucket"
-    }]
-  })
+  bucket                        = "umeet-dev-bucket"
+  force_destroy                 = true
+  block_public_acl              = false
+  block_public_policy           = false
+  ignore_public_acl             = false
+  enable_versioning             = true
+  bucket_iam_policy_name        = "umeet_bucket_iam_policy_name"
 
   tags                  = {
     name = "meet-dev-bucket-tag"

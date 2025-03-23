@@ -12,3 +12,7 @@ output "bucket_versioning" {
   value           = aws_s3_bucket.this.versioning
 }
 
+
+output "bucket_iam_policy_name" {
+  value = aws_iam_policy.bucket_policy.name
+}
