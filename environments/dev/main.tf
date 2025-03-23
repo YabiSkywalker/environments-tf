@@ -40,3 +40,24 @@ module "umeet_instances" {
    }
  }
 }
+
+module "umeet_bucket" {
+  source                = "../../modules/s3"
+
+  bucket                = "umeet-dev-bucket"
+  enable_versioning     = true
+  bucket_policy         = jsonencode({
+
+    Version = "2012-10-17"
+    Statement = [{
+      Effect    = "Allow"
+      Principal = "*"
+      Action    = "s3:GetObject"
+      Resource  = "arn:aws:s3:::umeet-dev-bucket"
+    }]
+  })
+
+  tags                  = {
+    name = "meet-dev-bucket-tag"
+  }
+}
