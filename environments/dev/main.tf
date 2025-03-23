@@ -1,10 +1,10 @@
 module "umeet_vpc" {
   source = "../../modules/network"
 
-  security_group_tag      = "allow_tls"
-  api_subnet_tag          = "api_subnet"
-  kafka_subnet_tag        = "kafka_subnet"
-  vpc_tag                 = "main_vpc"
+  security_group_tag        = "allow_tls"
+  api_subnet_tag            = "api_subnet"
+  kafka_subnet_tag          = "kafka_subnet"
+  vpc_tag                   = "main_vpc"
 }
 
 module "umeet_instances" {

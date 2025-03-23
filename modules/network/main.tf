@@ -25,9 +25,9 @@ resource "aws_subnet" "kafka_subnet" {
 }
 
 resource "aws_security_group" "allow_tls" {
-  name        = "allow_tls"
-  description = "Allow TLS inbound traffic and all outbound traffic"
-  vpc_id      = aws_vpc.main_vpc.id
+  name              = "allow_tls"
+  description       = "Allow TLS inbound traffic and all outbound traffic"
+  vpc_id            = aws_vpc.main_vpc.id
 
   tags = {
     Name = var.security_group_tag
