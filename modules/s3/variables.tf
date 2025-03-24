@@ -33,7 +33,4 @@ variable "tags" {
     type        = map(string)
 }
 
-variable "bucket_iam_policy_name" {
-    description = "Name for IAM policy specific to bucket"
-    type        = string
-}
+

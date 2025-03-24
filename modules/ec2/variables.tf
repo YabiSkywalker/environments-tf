@@ -7,6 +7,7 @@ variable "instances" {
    key_name                    = string
    vpc_security_group_ids      = optional(list(string))
    associate_public_ip_address = bool
+   iam_instance_profile         = string
    tags                        = map(string)
  }))
 }

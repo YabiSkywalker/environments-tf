@@ -6,6 +6,7 @@ resource "aws_instance" "this" {
   key_name                      = each.value.key_name
   vpc_security_group_ids        = each.value.vpc_security_group_ids
   associate_public_ip_address   = each.value.associate_public_ip_address
+  iam_instance_profile           = each.value.iam_instance_profile
 
   tags = merge(
     {

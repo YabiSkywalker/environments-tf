@@ -21,28 +21,5 @@ resource "aws_s3_bucket_public_access_block" "this" {
   ignore_public_acls  = var.ignore_public_acl
 }
 
-resource "aws_iam_policy" "bucket_policy" {
 
-  name        = var.bucket_iam_policy_name
-  path        = "/"
-  description = "Allow "
-  policy      = jsonencode({
-    "Version" : "2012-10-17",
-    "Statement" : [
-      {
-        "Sid" : "VisualEditor0",
-        "Effect" : "Allow",
-        "Action" : [
-          "s3:PutObject",
-          "s3:GetObject",
-          "s3:ListBucket",
-          "s3:DeleteObject"
-        ],
-        "Resource" : [
-          "arn:aws:s3:::*/*",
-          "arn:aws:s3:::umeet-dev-bucket"
-        ]
-      }
-    ]
-  })
-}
+

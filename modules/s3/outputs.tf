@@ -3,6 +3,10 @@ output "bucket_id" {
   value           = aws_s3_bucket.this.id
 }
 
+output "bucket" {
+  value = aws_s3_bucket.this.bucket
+}
+
 output "bucket_arn" {
   value = aws_s3_bucket.this.arn
 }
@@ -13,6 +17,3 @@ output "bucket_versioning" {
 }
 
 
-output "bucket_iam_policy_name" {
-  value = aws_iam_policy.bucket_policy.name
-}
