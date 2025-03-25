@@ -1,15 +1,12 @@
-output "vpc_id" {
-  value = aws_vpc.main_vpc.id
+output "vpc-id" {
+  value = { for k, v in aws_vpc.this : k => v.id}
 }
 
-output "api_subnet_id" {
-  value = aws_subnet.api_subnet.id
-}
 
-output "kafka_subnet_id" {
-  value = aws_subnet.kafka_subnet.id
+output "subnet_id" {
+  value = { for k, v in aws_subnet.this : k => v.id}
 }
 
 output "security_group_id" {
-  value = aws_security_group.allow_tls.id
+  value = { for k, v in aws_security_group.this : k => v.id }
 }

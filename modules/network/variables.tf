@@ -1,20 +1,41 @@
-variable "vpc_tag" {
-  description = "The name for the VPC"
-  type        = string
+variable "vpc" {
+  description = "VPC variable"
+  type = map(object({
+    cidr_block    = string
+    tags          = map(string)
+  }))
 }
 
-variable "api_subnet_tag" {
-  description = "The name for the api subnet"
-  type        = string
+variable "subnets" {
+  description = "VPC subnets"
+  type = map(object({
+    vpc_id      = string
+    cidr_block  = string
+
+    tags        = map(string)
+  }))
 }
 
-variable "kafka_subnet_tag" {
-  description = "The name for the kafka subnet"
-  type        = string
+variable "security_group" {
+  description   = "Security group variable"
+  type          = map(object({
+    name        = string
+    description = string
+    vpc_id      = string
+
+    tags        = map(string)
+  }))
 }
 
-variable "security_group_tag" {
-  description = "The name for the security group"
-  type        = string
-}
 
+variable "security_group_rule" {
+  description           = "Security group ingress/egress rules"
+  type = map(object({
+    type                = string
+    security_group_id   = string
+    cidr_block          = list(string)
+    from_port           = number
+    to_port             = number
+    protocol            = string
+  }))
+}

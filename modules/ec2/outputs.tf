@@ -29,7 +29,7 @@ output "instance_state" {
 }
 
 
-output "public_ip" {
+output "public-ip" {
   description = "The public IP address assigned to the instance, if applicable."
   value = { for k, v in aws_instance.this : k => v.public_ip }
 }

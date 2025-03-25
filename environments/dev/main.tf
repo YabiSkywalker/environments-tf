@@ -1,17 +1,74 @@
-
-module "route53_record" {
-  source = ""
-}
-
-
-
 module "umeet_vpc" {
   source = "../../modules/network"
 
-  security_group_tag        = "allow_tls_dev"
-  api_subnet_tag            = "api_subnet_dev"
-  kafka_subnet_tag          = "kafka_subnet_dev"
-  vpc_tag                   = "main_vpc_dev"
+  vpc                 = {
+    main-vpc = {
+      cidr_block  = "10.0.0.0/24"
+      tags        = {
+        env = "dev-vpc"
+      }
+    }
+  }
+
+  subnets             = {
+    api-subnet = {
+      vpc_id      = module.umeet_vpc.vpc-id
+      cidr_block  = "10.0.0.0/25"
+      tags        = {
+        env = "api-dev-subnet"
+      }
+    }
+
+    kafka-subnet = {
+      vpc_id      = module.umeet_vpc.vpc-id
+      cidr_block  = "10.0.0.0/25"
+      tags        = {
+        env = "kafka-dev-subnet"
+      }
+    }
+  }
+  security_group      = {
+    umeet-sg = {
+      name          = "api-sg"
+      description   = "Allow TLS inbound traffic and all outbound traffic"
+      vpc_id        = module.umeet_vpc.vpc-id
+
+      tags        = {
+        resource = "security_group_all_tls"
+      }
+    }
+  }
+
+  security_group_rule = {
+    allow-ipv4 = {
+      type = "ingress"
+      security_group_id = module.umeet_vpc.security_group_id
+      cidr_bloc = ["0.0.0.0/0"]
+      from_port = 80
+      to_port = 80
+      protocol = "tcp"
+    }
+
+    allow-ipv6 = {
+      type = "ingress"
+      security_group_id = module.umeet_vpc.security_group_id
+      cidr_block = ["0.0.0.0/0"]
+      from_port = 443
+      to_port = 443
+      protocol = "tcp"
+    }
+
+    allow-ipv4 = {
+      type = "egress"
+      security_group_id = module.umeet_vpc.security_group_id
+      cidr_block = ["0.0.0.0/0"]
+      from_port = 0
+      to_port = 0
+      protocol = "-1"
+    }
+  }
+
+
 }
 
 module "umeet_api_role" {
@@ -80,7 +137,7 @@ module "umeet_instances" {
    web-1 = {
      ami_id                        = "ami-04b4f1a9cf54c11d0"
      instance_type                 = "t2.micro"
-     subnet_id                     = module.umeet_vpc.api_subnet_id
+     subnet_id                     = module.umeet_vpc.subnet_id["api-subnet"]
      key_name                      = "yab"
      vpc_security_group_ids        = [module.umeet_vpc.security_group_id]
      associate_public_ip_address   = true
@@ -95,7 +152,7 @@ module "umeet_instances" {
    web-2 = {
      ami_id                        = "ami-04b4f1a9cf54c11d0"
      instance_type                 = "t2.micro"
-     subnet_id                     = module.umeet_vpc.kafka_subnet_id
+     subnet_id                     = module.umeet_vpc.subnet_id["kafka-subnet"]
      key_name                      = "yab"
      vpc_security_group_ids        = [module.umeet_vpc.security_group_id]
      associate_public_ip_address   = true
@@ -107,4 +164,18 @@ module "umeet_instances" {
      }
    }
  }
+}
+
+module "route53_record" {
+  source = "../../modules/route53"
+
+  dns_record = {
+    linkd-dev = {
+      zone_id = "Z07795005D9AWXUA9YB"
+      name    = "linkd-dev.yabi.dev"
+      type    = "A"
+      ttl     = 1
+      records = [module.umeet_instances.public-ip["web-1"]]
+    }
+  }
 }
