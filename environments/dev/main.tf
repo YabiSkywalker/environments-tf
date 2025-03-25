@@ -21,7 +21,7 @@ module "umeet_vpc" {
 
     kafka-subnet = {
       vpc_id      = module.umeet_vpc.vpc-id
-      cidr_block  = "10.0.0.0/25"
+      cidr_block  = "10.0.0.128/25"
       tags        = {
         env = "kafka-dev-subnet"
       }
