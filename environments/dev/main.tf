@@ -1,9 +1,18 @@
-module "umeet_vpc" {
+locals {
+  main_vpc_id    = module.umeet-vpc.vpc-id["main-vpc"]
+  security_group = module.umeet-vpc.security_group_id["umeet-sg"]
+  igw_id         = module.umeet-vpc.igw_id
+  route-table-id = module.umeet-vpc.route-table-id
+  subnet-id      = module.umeet-vpc.subnet_id
+}
+
+module "umeet-vpc" {
   source = "../../modules/network"
 
   vpc                 = {
     main-vpc = {
       cidr_block  = "10.0.0.0/24"
+      enable_dns_hostnames  = true
       tags        = {
         env = "dev-vpc"
       }
@@ -12,16 +21,20 @@ module "umeet_vpc" {
 
   subnets             = {
     api-subnet = {
-      vpc_id      = module.umeet_vpc.vpc-id
-      cidr_block  = "10.0.0.0/25"
+      vpc_id                  = local.main_vpc_id
+      cidr_block              = "10.0.0.0/25"
+      map_public_ip_on_launch = true
+
       tags        = {
         env = "api-dev-subnet"
       }
     }
 
     kafka-subnet = {
-      vpc_id      = module.umeet_vpc.vpc-id
+      vpc_id      = local.main_vpc_id
       cidr_block  = "10.0.0.128/25"
+      map_public_ip_on_launch = false
+
       tags        = {
         env = "kafka-dev-subnet"
       }
@@ -31,7 +44,7 @@ module "umeet_vpc" {
     umeet-sg = {
       name          = "api-sg"
       description   = "Allow TLS inbound traffic and all outbound traffic"
-      vpc_id        = module.umeet_vpc.vpc-id
+      vpc_id        = local.main_vpc_id
 
       tags        = {
         resource = "security_group_all_tls"
@@ -40,34 +53,79 @@ module "umeet_vpc" {
   }
 
   security_group_rule = {
-    allow-ipv4 = {
+    allow-ing-22 = {
       type = "ingress"
-      security_group_id = module.umeet_vpc.security_group_id
-      cidr_bloc = ["0.0.0.0/0"]
+      security_group_id = local.security_group
+      cidr_block = ["0.0.0.0/0"]
+      ipv6_cidr_blocks = ["::/0"]
+      from_port = 22
+      to_port = 22
+      protocol = "tcp"
+    }
+    allow-ing-80 = {
+      type = "ingress"
+      security_group_id = local.security_group
+      cidr_block = ["0.0.0.0/0"]
+      ipv6_cidr_blocks = ["::/0"]
       from_port = 80
       to_port = 80
       protocol = "tcp"
     }
 
-    allow-ipv6 = {
+    allow-ing-443 = {
       type = "ingress"
-      security_group_id = module.umeet_vpc.security_group_id
+      security_group_id = local.security_group
       cidr_block = ["0.0.0.0/0"]
+      ipv6_cidr_blocks = ["::/0"]
       from_port = 443
       to_port = 443
       protocol = "tcp"
     }
 
-    allow-ipv4 = {
+    allow-egress = {
       type = "egress"
-      security_group_id = module.umeet_vpc.security_group_id
+      security_group_id = local.security_group
       cidr_block = ["0.0.0.0/0"]
+      ipv6_cidr_blocks = ["::/0"]
       from_port = 0
       to_port = 0
       protocol = "-1"
     }
   }
 
+  igw            = {
+    api-igw = {
+      vpc_id = local.main_vpc_id
+      tags = {
+        env  = "api-igw"
+     }
+    }
+  }
+
+  route-table      = {
+    api-route-table = {
+      vpc_id  = local.main_vpc_id
+      tags = {
+        name  = "api-route-table"
+     }
+    }
+  }
+
+  route               = {
+    api-route = {
+      route_table_id          = local.route-table-id["api-route-table"]
+      gateway_id              = local.igw_id["api-igw"]
+      destination_cidr_block  = "0.0.0.0/0"
+  }
+}
+
+  route-association = {
+    api-association = {
+      subnet_id      = local.subnet-id["api-subnet"]
+      #gateway_id      = local.igw_id
+      route_table_id = local.route-table-id["api-route-table"]
+    }
+  }
 
 }
 
@@ -137,9 +195,9 @@ module "umeet_instances" {
    web-1 = {
      ami_id                        = "ami-04b4f1a9cf54c11d0"
      instance_type                 = "t2.micro"
-     subnet_id                     = module.umeet_vpc.subnet_id["api-subnet"]
+     subnet_id                     = module.umeet-vpc.subnet_id["api-subnet"]
      key_name                      = "yab"
-     vpc_security_group_ids        = [module.umeet_vpc.security_group_id]
+     vpc_security_group_ids        = [local.security_group]
      associate_public_ip_address   = true
      iam_instance_profile           = module.umeet_api_role.iam_instance_profile_name
 
@@ -152,9 +210,9 @@ module "umeet_instances" {
    web-2 = {
      ami_id                        = "ami-04b4f1a9cf54c11d0"
      instance_type                 = "t2.micro"
-     subnet_id                     = module.umeet_vpc.subnet_id["kafka-subnet"]
+     subnet_id                     = module.umeet-vpc.subnet_id["kafka-subnet"]
      key_name                      = "yab"
-     vpc_security_group_ids        = [module.umeet_vpc.security_group_id]
+     vpc_security_group_ids        = [local.security_group]
      associate_public_ip_address   = true
      iam_instance_profile           = module.umeet_api_role.iam_instance_profile_name
 

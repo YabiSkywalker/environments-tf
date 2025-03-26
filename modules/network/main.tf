@@ -1,6 +1,7 @@
 resource "aws_vpc" "this" {
   for_each = var.vpc
   cidr_block = each.value.cidr_block
+  enable_dns_hostnames = each.value.enable_dns_hostnames
 
   tags = merge({
     Name = each.key
@@ -10,8 +11,9 @@ resource "aws_vpc" "this" {
 
 resource "aws_subnet" "this" {
   for_each = var.subnets
-  vpc_id     = each.value.vpc_id
-  cidr_block = each.value.cidr_block
+  vpc_id                  = each.value.vpc_id
+  cidr_block              = each.value.cidr_block
+  map_public_ip_on_launch = each.value.map_public_ip_on_launch
 
   tags = merge({
     Name = each.key
@@ -38,13 +40,56 @@ resource "aws_security_group_rule" "this" {
   type              = each.value.type
   security_group_id = each.value.security_group_id
   cidr_blocks       = each.value.cidr_block
+  ipv6_cidr_blocks  = each.value.ipv6_cidr_blocks
   from_port         = each.value.from_port
   to_port           = each.value.to_port
   protocol          = each.value.protocol
 
 }
 
+resource "aws_internet_gateway" "this" {
+  for_each = var.igw
+  vpc_id   = each.value.vpc_id
 
+  tags = merge({
+    Name = each.key
+  },
+  each.value.tags)
+}
+
+resource "aws_route_table" "this" {
+  for_each = var.route-table
+
+  vpc_id = each.value.vpc_id
+
+  tags = merge({
+    Name = each.key
+  },
+  each.value.tags)
+}
+
+resource "aws_route" "this" {
+  for_each = var.route
+  route_table_id            = each.value.route_table_id
+  gateway_id                = each.value.gateway_id
+  destination_cidr_block    = each.value.destination_cidr_block
+}
+
+resource "aws_route_table_association" "this-subnet" {
+  for_each = var.route-association
+  subnet_id      = each.value.subnet_id
+  gateway_id     = each.value.gateway_id
+  route_table_id = each.value.route_table_id
+}
+
+
+
+
+#resource "aws_internet_gateway_attachment" "this" {
+ # for_each = var.igw_attachment
+  #internet_gateway_id = each.value.internet_gateway_id
+  #vpc_id              = each.value.vpc_id
+#}
 
 
 /*

@@ -45,5 +45,10 @@ output "instance_name_tags" {
   value = { for k, v in aws_instance.this : k => v.tags }
 }
 
+output "public-dns" {
+  value = { for k, v in aws_instance.this : k => v.public_dns }
+}
 
-
+output "public-ip-association" {
+  value = { for k, v in aws_instance.this : k => v.associate_public_ip_address }
+}
