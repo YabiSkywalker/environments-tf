@@ -2,7 +2,7 @@ variable "vpc" {
   description = "VPC variable"
   type = map(object({
     cidr_block    = string
-    enable_dns_hostnames  = optional(bool)
+    enable_dns_hostnames  = string
     tags          = map(string)
   }))
 }
@@ -36,7 +36,7 @@ variable "security_group_rule" {
     type                = string
     security_group_id   = string
     cidr_block          = list(string)
-    ipv6_cidr_blocks    = list(string)
+    ipv6_cidr_blocks    = optional(list(string))
     from_port           = number
     to_port             = number
     protocol            = string
@@ -68,7 +68,6 @@ variable "route" {
 variable "route-association" {
   type = map(object({
       subnet_id      = optional(string)
-      gateway_id     = optional(string)
       route_table_id = string
   }))
 }

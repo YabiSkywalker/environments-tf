@@ -78,7 +78,6 @@ resource "aws_route" "this" {
 resource "aws_route_table_association" "this-subnet" {
   for_each = var.route-association
   subnet_id      = each.value.subnet_id
-  gateway_id     = each.value.gateway_id
   route_table_id = each.value.route_table_id
 }
 
