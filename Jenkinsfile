@@ -16,7 +16,9 @@ pipeline {
 
         stage('Enter environment directory') {
             steps {
-                sh "cd /environments/dev"
+                dir('environments/dev') { // Use relative path
+                    sh "terraform init"
+                }
             }
         }
 
