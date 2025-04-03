@@ -14,29 +14,27 @@ pipeline {
             }
         }
 
-        stage('Enter environment directory') {
+        stage('Initialize') {
             steps {
                 dir('environments/dev') { // Use relative path
                     sh "terraform init"
-                }
-            }
-        }
-
-        stage('Initialize') {
-            steps {
-                sh "terraform init"
+                }"
             }
         }
 
         stage('Validate syntax') {
             steps {
-                sh "terraform validate"
+                dir('environments/dev') { // Use relative path
+                    sh "terraform validate"
+                }
             }
         }
 
         stage('Plan') {
             steps {
-                sh "terraform plan"
+                dir('environments/dev') { // Use relative path
+                    sh "terraform plan"
+                }
             }
         }
     }
