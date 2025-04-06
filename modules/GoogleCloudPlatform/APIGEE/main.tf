@@ -9,8 +9,6 @@ resource "google_apigee_organization" "this" {
   project_id        = each.value.project_id
   analytics_region  = each.value.analytics_region
   authorized_network = "projects/${each.value.authorized_network}/global/networks"
-
- # depends_on = [google_project_service.this]
 }
 
 resource "google_apigee_environment" "this" {
@@ -18,7 +16,7 @@ resource "google_apigee_environment" "this" {
   org_id = each.value.org_id
   name   = each.value.name
 
- # depends_on = [google_apigee_organization.this.id]
+
 }
 
 resource "google_apigee_instance" "this" {
@@ -26,9 +24,7 @@ resource "google_apigee_instance" "this" {
   name            = each.value.name
   org_id          = each.value.org_id
   location        = each.value.location
-  #runtime_ip_range = each.value.runtime_ip_range
 
-  #depends_on = [google_apigee_organization.this]
 }
 
 resource "google_apigee_instance_attachment" "this" {

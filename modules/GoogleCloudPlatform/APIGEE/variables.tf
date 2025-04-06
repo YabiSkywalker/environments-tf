@@ -13,9 +13,6 @@ variable "google-apigee-organization" {
     analytics_region   = string
     authorized_network = string
 
-    /*"projects/${var.project_id}/global/networks/${var.vpc_network}"
-     -- example of how this gonna look
-     */
   }))
 }
 
@@ -31,7 +28,7 @@ variable "google-apigee-instance" {
     name = string
     org_id = string
     location = string
-    #runtime_ip_range = string
+
   }))
 }
 
