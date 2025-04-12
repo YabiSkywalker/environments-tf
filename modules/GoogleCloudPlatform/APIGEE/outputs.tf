@@ -1,5 +1,13 @@
+output "google-project-service-project" {
+  value = {for k, v in google_project_service.this : k=> v.project}
+}
+
 output "google-project-service-id" {
   value = {for k, v in google_project_service.this : k=> v.id}
+}
+
+output "google-compute-network-id" {
+  value = {for k, v in google_compute_network.this : k=> v.id}
 }
 
 output "google-apigee-organization-id" {

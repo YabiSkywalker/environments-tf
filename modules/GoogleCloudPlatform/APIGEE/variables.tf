@@ -6,6 +6,13 @@ variable "google-project-service" {
   }))
 }
 
+variable "google-compute-network" {
+  type = map(object({
+    project  = string
+    name     = string
+  }))
+}
+
 variable "google-apigee-organization" {
   description = "APIGEE project definition."
   type = map(object({

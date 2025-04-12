@@ -4,11 +4,17 @@ resource "google_project_service" "this" {
   service = each.value.service
 }
 
+resource "google_compute_network" "this" {
+  for_each = var.google-compute-network
+  project = each.value.project
+  name    = each.value.name
+}
+
 resource "google_apigee_organization" "this" {
   for_each = var.google-apigee-organization
   project_id        = each.value.project_id
   analytics_region  = each.value.analytics_region
-  authorized_network = "projects/${each.value.authorized_network}/global/networks"
+  authorized_network = each.value.authorized_network
 }
 
 resource "google_apigee_environment" "this" {
