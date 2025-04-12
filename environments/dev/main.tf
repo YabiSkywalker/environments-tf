@@ -6,12 +6,14 @@ locals {
   route-table-id                  = module.umeet-vpc.route-table-id
   subnet-id                       = module.umeet-vpc.subnet_id
 */
-  google-proj-svc-name            = module.google-apigee.google-project-service-project
-  google-proj-svc-id              = module.google-apigee.google-project-service-id
-  google-apigee-org-id            = module.google-apigee.google-apigee-organization-id
-  google-apigee-environment-name  = module.google-apigee.google-apigee-environment-name
-  google-apigee-instance-id       = module.google-apigee.google-apigee-instance-id
-  google-compute-network-id       = module.google-apigee.google-compute-network-id
+  google-proj-svc-name                = module.google-apigee.google-project-service-project
+  google-proj-svc-id                  = module.google-apigee.google-project-service-id
+  google-project-service              = module.google-apigee.google-project-service
+  google-apigee-org-id                = module.google-apigee.google-apigee-organization-id
+  google-apigee-environment-name      = module.google-apigee.google-apigee-environment-name
+  google-apigee-instance-id           = module.google-apigee.google-apigee-instance-id
+  google-compute-network-id           = module.google-apigee.google-compute-network-id
+  google-compute-global-address-name  = module.google-apigee.google-compute-global-address-name
 }
 
 /*
@@ -285,6 +287,11 @@ module "google-apigee" {
         project = "umeet-gate"
         service = "apigee.googleapis.com"
     }
+
+    umeet-network-service = {
+        project = "umeet-gate"
+        service = "servicenetworking.googleapis.com"
+    }
   }
 
   google-compute-network = {
@@ -294,9 +301,29 @@ module "google-apigee" {
     }
   }
 
+  google-compute-global-address = {
+    umeet-compute-global-address = {
+        name          = "apigee-range"
+        project       = "umeet-gate"
+        purpose       = "VPC_PEERING"
+        address_type  = "INTERNAL"
+        prefix_length = 16
+        network       = local.google-compute-network-id["umeet-api-gateway-vpc"]
+    }
+  }
+
+    google-service-networking-connection = {
+    umeet-service-networking-conection = {
+      network                 = local.google-compute-network-id["umeet-api-gateway-vpc"]
+      service                 = local.google-project-service["umeet-network-service"]
+      reserved_peering_ranges = [local.google-compute-global-address-name["umeet-compute-global-address"]]
+    }
+  }
+
   google-apigee-organization = {
     umeet-apigee-org = {
-      project_id         = data.google_client_config.current.project
+      project_id         = "umeet-gate"
+      //data.google_client_config.current.project
       //local.google-proj-svc-id["umeet-project-service"]
       analytics_region   = "us-central1"
       authorized_network = local.google-compute-network-id["umeet-api-gateway-vpc"]
@@ -316,6 +343,7 @@ module "google-apigee" {
         org_id           = local.google-apigee-org-id["umeet-apigee-org"]
         location         = "us-central1"
         #runtime_ip_range = "10.138.0.0/20"
+
     }
   }
   google-apigee-environment-attachment = {

@@ -6,8 +6,16 @@ output "google-project-service-id" {
   value = {for k, v in google_project_service.this : k=> v.id}
 }
 
+output "google-project-service" {
+  value = {for k, v in google_project_service.this : k=> v.service}
+}
+
 output "google-compute-network-id" {
   value = {for k, v in google_compute_network.this : k=> v.id}
+}
+
+output "google-compute-global-address-name" {
+  value = {for k, v in google_compute_global_address.this : k=> v.name}
 }
 
 output "google-apigee-organization-id" {

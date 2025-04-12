@@ -13,6 +13,25 @@ variable "google-compute-network" {
   }))
 }
 
+variable "google-compute-global-address" {
+  type = map(object({
+    project       = string
+    name          = string
+    purpose       = string
+    address_type  = string
+    prefix_length = string
+    network       = string
+  }))
+}
+
+variable "google-service-networking-connection" {
+  type = map(object({
+    network                  = string
+    service                  = string
+    reserved_peering_ranges  = list(string)
+  }))
+}
+
 variable "google-apigee-organization" {
   description = "APIGEE project definition."
   type = map(object({
